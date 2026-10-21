@@ -1,0 +1,42 @@
+{
+  "name": "@miniledger/mobile",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "start": "npx expo start -c",
+    "android": "npx expo start --android -c",
+    "ios": "npx expo start --ios -c",
+    "web": "npx expo start --web -c",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@expo/vector-icons": "^15.0.2",
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "@react-native-community/datetimepicker": "9.1.0",
+    "expo": "~57.0.31",
+    "expo-file-system": "~57.0.7",
+    "expo-haptics": "~57.0.3",
+    "expo-image-picker": "~57.0.20",
+    "expo-linear-gradient": "~57.0.2",
+    "expo-splash-screen": "~57.0.10",
+    "expo-status-bar": "~57.0.1",
+    "i18next": "^23.16.8",
+    "react": "19.2.3",
+    "react-i18next": "^15.1.1",
+    "react-native": "^0.86.3",
+    "react-native-gesture-handler": "~2.32.0",
+    "react-native-reanimated": "4.5.1",
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-screens": "~4.26.0",
+    "react-native-svg": "15.15.4",
+    "react-native-worklets": "0.10.4",
+    "zod": "^3.23.8",
+    "zustand": "^5.0.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.25.2",
+    "@types/react": "~19.2.4",
+    "typescript": "^5.6.3"
+  }
+}

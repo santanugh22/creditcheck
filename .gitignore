@@ -1,0 +1,50 @@
+# Dependencies
+node_modules/
+*/node_modules/
+*/*/node_modules/
+.pnp
+.pnp.js
+
+# Expo
+.expo/
+*.expo/
+web-build/
+
+# Build outputs
+dist/
+packages/backend/dist/
+
+# Uploads & User Generated Files
+packages/backend/uploads/*
+!packages/backend/uploads/.gitkeep
+
+# Environment variables & Secrets
+.env
+.env.local
+.env.*.local
+packages/backend/.env
+!.env.example
+!packages/backend/.env.example
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# OS & Editor Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Test coverage
+coverage/
+*.lcov

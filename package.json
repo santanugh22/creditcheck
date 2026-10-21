@@ -1,0 +1,29 @@
+{
+  "name": "miniledger-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MiniLedger (Bharat Edition) - Peer-to-Peer Friend Loan & Khata Tracker Monorepo",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "start": "npm run dev:mobile",
+    "prepare:assets": "node scripts/generate-assets.js",
+    "dev:backend": "npm --workspace=@miniledger/backend run dev",
+    "build:backend": "npm --workspace=@miniledger/backend run build",
+    "start:backend": "npm --workspace=@miniledger/backend run start",
+    "test:backend": "npm --workspace=@miniledger/backend run test",
+    "db:migrate": "npm --workspace=@miniledger/backend run db:migrate",
+    "dev:mobile": "npm run prepare:assets && npm --workspace=@miniledger/mobile run start",
+    "android": "npm run prepare:assets && npm --workspace=@miniledger/mobile run android",
+    "ios": "npm run prepare:assets && npm --workspace=@miniledger/mobile run ios",
+    "typecheck": "tsc --noEmit && npm --workspace=@miniledger/backend run typecheck && npm --workspace=@miniledger/mobile run typecheck"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "author": "MiniLedger Engineering",
+  "license": "MIT"
+}

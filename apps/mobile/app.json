@@ -1,0 +1,48 @@
+{
+  "expo": {
+    "name": "MiniLedger",
+    "slug": "miniledger-bharat",
+    "version": "1.0.0",
+    "sdkVersion": "57.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#090D16"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.miniledger.bharat",
+      "infoPlist": {
+        "NSCameraUsageDescription": "MiniLedger needs camera access so you can snap and attach receipt photos to loan entries.",
+        "NSPhotoLibraryUsageDescription": "MiniLedger needs photo library access so you can attach payment screenshots or receipts to loan entries."
+      }
+    },
+    "android": {
+      "package": "com.miniledger.bharat",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#090D16"
+      },
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow MiniLedger to access your photos to attach payment receipts.",
+          "cameraPermission": "Allow MiniLedger to use your camera to capture loan receipts."
+        }
+      ]
+    ]
+  }
+}
