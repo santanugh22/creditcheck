@@ -293,13 +293,13 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
       transparent
       onRequestClose={handleClose}
     >
-      <KeyboardAvoidingView
-        style={styles.backdrop}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 10 : 0}
-      >
+      <View style={styles.backdrop}>
         {/* Backdrop dismiss pressable */}
-        <Pressable style={styles.backdropDismiss} onPress={handleClose} />
+        <Pressable
+          style={styles.backdropDismiss}
+          onPress={handleClose}
+          accessibilityLabel="Close modal"
+        />
 
         <View
           style={[
@@ -350,7 +350,8 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
             style={styles.sheetScroll}
             contentContainerStyle={styles.formScroll}
             keyboardShouldPersistTaps="handled"
-            keyboardDismissMode="none"
+            keyboardDismissMode={Platform.OS === "ios" ? "interactive" : "on-drag"}
+            automaticallyAdjustKeyboardInsets={Platform.OS === "ios"}
             showsVerticalScrollIndicator={false}
           >
             {/* Error Banner */}
@@ -392,7 +393,8 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                 </Text>
               </View>
 
-              <View
+              <Pressable
+                onPress={() => amountInputRef.current?.focus()}
                 style={[
                   styles.amountInputContainer,
                   {
@@ -461,7 +463,7 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                     <CloseIcon size={12} color={colors.textSecondary} />
                   </TactilePressable>
                 </View>
-              </View>
+              </Pressable>
 
               {/* Quick Preset Amount Chips */}
               <View style={styles.quickAmountRow}>
@@ -1126,7 +1128,7 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
             </View>
           </ScrollView>
         </View>
-      </KeyboardAvoidingView>
+      </View>
     </Modal>
   );
 }

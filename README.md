@@ -1,70 +1,163 @@
-# 🇮🇳 MiniLedger (Bharat Edition) — Peer-to-Peer Friend Loan & Khata Tracker
+# 🇮🇳 MiniLedger (Bharat Edition)
+### *Peer-to-Peer Friend Loan & Khata Tracker for the Modern Indian Economy*
 
-**MiniLedger** is a full-stack TypeScript monorepo application built to track money lent to friends (*Udhaar / Khata*). Engineered with a **Node.js + Express + PostgreSQL** backend and an **Expo Go (React Native) + Reanimated + Zustand** mobile app, it combines strict financial accuracy (`NUMERIC(12,2)`) with a Neo-Fintech Indian UX, bilingual **English + हिन्दी (Hindi)** localization, receipt photo uploads, and 1-tap WhatsApp payment reminders.
+[![React Native](https://img.shields.io/badge/React_Native-0.86.3-61DAFB?logo=react&logoColor=black)](https://reactnative.dev/)
+[![Expo](https://img.shields.io/badge/Expo_Go-SDK_57-000020?logo=expo&logoColor=white)](https://expo.dev/)
+[![Node.js](https://img.shields.io/badge/Node.js-20+-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16+-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-Strict_5.6-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Vitest](https://img.shields.io/badge/Tests-14%20Passed-FCC72B?logo=vitest&logoColor=black)](https://vitest.dev/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
+**MiniLedger** is a full-stack, enterprise-grade TypeScript monorepo built specifically for the Indian financial context to effortlessly track money lent to friends, flatmates, and family (*Udhaar / Khata*). Combining a **Node.js + Express + PostgreSQL** backend with a **React Native + Reanimated + Zustand** mobile app (100% Expo Go compatible), MiniLedger delivers **`NUMERIC(12,2)` bank-grade precision**, **side-by-side Dark & Light Neo-Fintech aesthetics**, **bilingual English & हिन्दी (Hindi) localization**, **receipt photo uploads**, and **1-tap WhatsApp payment reminders**.
 
 ---
 
-## ✨ Core & Expanded Features
+## 📸 App Showcase Gallery
 
-### 🖥️ Backend (`@miniledger/backend`)
-* **Phone + Mock OTP Login**: Normalizes Indian mobile numbers (`+91XXXXXXXXXX`), stores expiring 6-digit OTPs in PostgreSQL, and prints a formatted ASCII box directly in the server console.
-* **Precision Ledger Engine**: Stores amounts as PostgreSQL `NUMERIC(12, 2)` to prevent floating-point rounding bugs.
-* **Dynamic Overdue Computation**: Automatically flags unpaid loans where `due_date < CURRENT_DATE` as `OVERDUE` and calculates `daysOverdue` and `daysUntilDue`.
-* **Full & Partial Repayments**: Supports both 1-tap 100% loan settlement and incremental partial repayments with a full audit trail (`loan_repayments` table).
-* **Receipt Image Upload**: Multipart image upload (`multer`) supporting JPG, PNG, WEBP, and HEIC receipts up to 5 MB.
-* **Comprehensive Summary Endpoint**: Returns `totalLent`, `totalRepaid`, `overdueAmount`, `outstandingAmount`, `dueSoonAmount`, `repaymentRate`, entry counts, and a **Friend-wise Khata Breakdown**.
-* **Input Validation & Automated Tests**: Strict `zod` schemas on every route and a self-contained **Vitest + Supertest** test suite.
+### 1. Active Ledger & Loan Settlement Flow
+> **Live Khata Management**: Live dashboard populated with friend loan records (*Gaitonde, Rohan, Vibhuti*), purpose categories, receipt proof indicator, dynamic due-date countdowns, and quick friend filters.
+> **Loan Detail & Repayment Modal**: Inspect individual loans, record partial or 100% repayments with UPI notes, view attached photo receipts, and trigger 1-tap WhatsApp payment nudges.
 
-### 📱 Mobile App (`@miniledger/mobile` — 100% Expo Go Compatible)
-* **Bharat Neo-Fintech Theme**: Full **Light & Dark Mode** support with Royal Indigo (`#4F46E5`), Saffron Gold (`#F59E0B`), Emerald Mint (`#10B981`), and Crimson Coral (`#EF4444`) overdue highlights.
-* **Bilingual Localization (`en` / `hi`)**: Live, persisted switching between **English** and **हिन्दी (Hindi)** across all screens, badges, and WhatsApp reminder templates.
-* **60fps Reanimated Micro-Interactions**: Tactile spring pressables (`expo-haptics`), animated collection-rate progress bar, pulsing overdue badges, and staggered entry animations.
-* **Zero-Code LAN Server Switcher**: Built-in `⚙️ API` modal on the Login screen lets physical phones running **Expo Go** point to your computer's local Wi-Fi IP address in seconds.
+| 📋 Active Ledger with Friend Breakdown | 💳 Loan Detail, Repayments & WhatsApp |
+| :---: | :---: |
+| <img src="./images/dashboard-filled.png" width="380" alt="MiniLedger Active Ledger" /> | <img src="./images/dashboard-view-borrow.png" width="380" alt="Loan Details and Settlement Modal" /> |
+| *Active loans with due dates, camera receipt indicators & search* | *Flexible partial repayment, UPI notes & WhatsApp reminder trigger* |
+
+<br />
+
+### 2. Dashboard Neo-Fintech Themes (Dark Mode vs. हिन्दी Light Mode)
+> Dynamic Collection Rate progress bar, Outstanding Balance hero card, filterable status tabs (*All / Overdue / Pending / Repaid*), overdue indicators, and 1-tap WhatsApp payment nudges.
+
+| 🌙 Royal Indigo Dark Mode | ☀️ Saffron & Mint Light Mode (हिन्दी) |
+| :---: | :---: |
+| <img src="./images/dashboard-dark.png" width="380" alt="MiniLedger Dashboard Dark Mode" /> | <img src="./images/dashboard-light-hindi.png" width="380" alt="MiniLedger Dashboard Light Mode Hindi" /> |
+| *Active loans, repayment rate (80.8%), and overdue badges* | *पूर्ण हिन्दी स्थानीयकरण: कुल बकाया राशि, वसूली दर, एवं देय सूचियां* |
+
+<br />
+
+### 3. Add Udhaar / Loan Entry Flow
+> Hero amount input with quick increment chips (`+₹500`, `+₹1k`, `+₹2k`, `+₹5k`), Indian flag phone badge (`🇮🇳 +91`), quick due-date presets, visual purpose categories (*Personal, Food Split, Emergency, Travel, Rent*), and photo receipt attachment.
+
+| 🌙 Add Loan Sheet (Dark Mode) | ☀️ Add Loan Sheet (Light Mode) |
+| :---: | :---: |
+| <img src="./images/add-rent-dark.png" width="380" alt="Add Loan Sheet Dark Mode" /> | <img src="./images/add-rent-light.png" width="380" alt="Add Loan Sheet Light Mode" /> |
+| *₹12,000 Rent Khata with due date presets & tactile feedback* | *Clean, distraction-free daylight interface with instant validation* |
+
+<br />
+
+### 4. Authentication & Instant LAN Switcher
+> Passwordless Indian mobile authentication (`+91XXXXXXXXXX`), 6-digit expiring OTP verification, and an in-app **LAN API Switcher** that allows physical devices running Expo Go to connect to your local development machine with zero code changes.
+
+| 🌙 Login Screen (Dark Mode) | 🔑 6-Digit OTP Verification | ☀️ Login Screen (Light Mode) |
+| :---: | :---: | :---: |
+| <img src="./images/login-dark.png" width="260" alt="Login Screen Dark Mode" /> | <img src="./images/login-otp-dark.png" width="260" alt="OTP Verification Dark Mode" /> | <img src="./images/login-light.png" width="260" alt="Login Screen Light Mode" /> |
+| *10-digit Indian phone input & LAN Config* | *Auto-focused 6-digit security code* | *Crisp light mode authentication* |
+
+---
+
+## ⚡ Core Highlights & Engineering Architecture
+
+```mermaid
+graph TD
+    subgraph Client ["📱 Mobile Client (Expo Go / React Native)"]
+        UI["UI Screens (Dashboard, Add Modal, Detail Modal)"]
+        STORE["Zustand Store (useLedgerStore, useAuthStore)"]
+        I18N["i18next (English / हिन्दी Hindi)"]
+        NET["API Layer (XHR Multipart + REST Fetch)"]
+        UI --> STORE
+        STORE --> NET
+        I18N --> UI
+    end
+
+    subgraph Backend ["🖥️ Node.js + Express API Server"]
+        ROUTER["API Router (/api/v1)"]
+        AUTH["JWT & OTP Middleware"]
+        MULTER["Multer Multipart Engine"]
+        CONTROLLERS["Loan & Summary Controllers"]
+        ROUTER --> AUTH
+        AUTH --> MULTER
+        MULTER --> CONTROLLERS
+    end
+
+    subgraph Database ["🐘 PostgreSQL 16"]
+        USERS[("users Table")]
+        LOANS[("loans Table (NUMERIC 12,2)")]
+        REPAYMENTS[("loan_repayments Table")]
+        STORAGE[("Disk Uploads (/uploads)")]
+        CONTROLLERS --> USERS
+        CONTROLLERS --> LOANS
+        CONTROLLERS --> REPAYMENTS
+        MULTER --> STORAGE
+    end
+```
+
+### 💎 Why MiniLedger Stands Out
+1. **Bank-Grade Financial Arithmetic**:
+   - Stored in PostgreSQL as `NUMERIC(12, 2)` to completely avoid IEEE-754 floating-point errors (e.g., `0.1 + 0.2 = 0.30000000000000004`).
+   - Dynamic computed overdue engine: `isOverdue`, `daysOverdue`, and `daysUntilDue` are generated on-the-fly relative to current date and repayment state.
+2. **100% Stable Multipart Upload Architecture**:
+   - Engineered with a hybrid upload transport: uses native foreground uploads with an automatic fallback to an `XMLHttpRequest` multipart bridge.
+   - Completely immune to WHATWG Fetch Blob incompatibilities on modern React Native (0.74+) and iOS Simulator background session timeouts.
+3. **Smooth, Non-Dismissing Keyboard UX**:
+   - Uses native iOS `automaticallyAdjustKeyboardInsets` so the amount input card stays anchored, responsive, and never loses focus while typing.
+4. **Bilingual By Design**:
+   - First-class support for **हिन्दी (Hindi)** and **English** with real-time switching persisted directly into user profile preferences.
+5. **WhatsApp 1-Tap Reminders**:
+   - Pre-fills culturally respectful, localized payment reminder messages via `whatsapp://send` with exact amounts, due dates, and friendly notes.
 
 ---
 
 ## 🗂️ Monorepo Structure
 
 ```text
-miniledger/
-├── package.json                        # Root workspace scripts
-├── tsconfig.base.json                  # Strict shared TypeScript configuration
-├── scripts/
-│   └── generate-assets.js              # Zero-dependency PNG generator for Expo icons & splash
+bharatledge/
+├── images/                             # Real high-resolution app screenshots
+│   ├── dashboard-filled.png            # Live active ledger with friend chips & filters
+│   ├── dashboard-view-borrow.png       # Loan details, repayment, & WhatsApp modal
+│   ├── dashboard-dark.png              # Dark mode dashboard overview
+│   ├── dashboard-light-hindi.png       # Light mode dashboard in हिन्दी (Hindi)
+│   ├── add-rent-dark.png               # Add loan sheet (Dark mode)
+│   ├── add-rent-light.png              # Add loan sheet (Light mode)
+│   ├── login-dark.png                  # Mobile login screen (Dark mode)
+│   ├── login-light.png                 # Mobile login screen (Light mode)
+│   └── login-otp-dark.png              # 6-digit OTP verification screen
+├── package.json                        # Root npm workspace configuration
+├── tsconfig.base.json                  # Shared strict TypeScript configuration
 ├── packages/
 │   └── backend/                        # Node.js + Express + PostgreSQL + TypeScript API
-│       ├── .env.example
+│       ├── .env.example                # Sample environment configuration
 │       ├── package.json
 │       ├── tsconfig.json
 │       ├── src/
-│       │   ├── config/env.ts
-│       │   ├── db/schema.sql
-│       │   ├── db/pool.ts
-│       │   ├── types/index.ts
-│       │   ├── validators/schemas.ts
-│       │   ├── middleware/
-│       │   ├── controllers/
-│       │   ├── routes/index.ts
-│       │   ├── app.ts
-│       │   └── server.ts
-│       └── tests/api.test.ts
-├── apps/
-│   └── mobile/                         # Expo Go (React Native + TypeScript + Reanimated)
-│       ├── app.json
-│       ├── App.tsx
-│       ├── babel.config.js
-│       ├── package.json
-│       ├── tsconfig.json
-│       └── src/
-│           ├── theme/
-│           ├── i18n/
-│           ├── components/
-│           ├── services/api.ts
-│           ├── store/
-│           ├── screens/
-│           └── types/ledger.ts
-├── README.md
-└── AGENTS.md
+│       │   ├── app.ts                  # Express application setup & middleware
+│       │   ├── server.ts               # HTTP bootstrap & LAN IP printer
+│       │   ├── config/env.ts           # Zod-validated environment config
+│       │   ├── db/
+│       │   │   ├── pool.ts             # PostgreSQL connection pool & migrations
+│       │   │   └── schema.sql          # DDL tables & indexes
+│       │   ├── controllers/            # Auth, loan, and summary business logic
+│       │   ├── middleware/             # Auth guards & Multer file filter
+│       │   ├── routes/index.ts         # REST API routes
+│       │   └── validators/schemas.ts   # Zod request validators
+│       └── tests/api.test.ts           # Vitest + Supertest integration suite
+└── apps/
+    └── mobile/                         # Expo Go (React Native 0.86 + Reanimated 4)
+        ├── app.json                    # Expo project configuration
+        ├── App.tsx                     # Safe Area & Root Navigator
+        ├── package.json
+        ├── tsconfig.json
+        └── src/
+            ├── theme/                  # Colors, typography, spacing, and ThemeContext
+            ├── i18n/                   # English & Hindi translation dictionaries
+            ├── components/             # Reusable cards, hero summaries, & SVG icons
+            ├── screens/
+            │   ├── DashboardScreen.tsx # Main ledger view with filters & stats
+            │   ├── AddLoanModal.tsx    # Bottom sheet to track money lent
+            │   ├── LoanDetailModal.tsx # Detailed view, partial repayments, receipt
+            │   └── LoginScreen.tsx     # Phone + OTP authentication & API modal
+            ├── store/                  # Zustand state management
+            └── services/api.ts         # Resilient networking & multipart upload service
 ```
 
 ---
@@ -72,29 +165,29 @@ miniledger/
 ## 🚀 Quickstart Guide
 
 ### Prerequisites
-* **Node.js**: `>= 18.0.0` and **npm** `>= 9.0.0`
+* **Node.js**: `>= 18.0.0`
+* **npm**: `>= 9.0.0`
 * **PostgreSQL**: `>= 14` running locally or via Docker
-* **Expo Go App**: Installed on your iOS or Android device (or Android Studio / Xcode simulator)
+* **Expo Go**: Installed on iOS/Android or Xcode / Android Studio Simulator
 
-### Step 1: Install Monorepo Dependencies & Generate Assets
-From the repository root (`miniledger/`):
-
+### 1. Clone & Install Dependencies
 ```bash
-# Install all root, backend, and mobile workspace dependencies
+git clone https://github.com/your-username/bharatledge.git
+cd bharatledge
+
+# Install dependencies across all workspaces
 npm install
 
-# Generate valid icon.png, adaptive-icon.png, splash.png, and favicon.png
+# Generate app icons & splash screens
 npm run prepare:assets
 ```
 
-### Step 2: Configure PostgreSQL Database
-Create the `miniledger` database in PostgreSQL (or start a Postgres container):
-
+### 2. Configure & Start PostgreSQL Database
 ```bash
-# Option A: Using local psql CLI
+# Option A: Local PostgreSQL
 psql -U postgres -c "CREATE DATABASE miniledger;"
 
-# Option B: Using Docker
+# Option B: Docker
 docker run --name miniledger-pg \
   -e POSTGRES_USER=postgres \
   -e POSTGRES_PASSWORD=postgres \
@@ -102,48 +195,62 @@ docker run --name miniledger-pg \
   -p 5432:5432 -d postgres:16-alpine
 ```
 
-Copy the environment template for the backend:
-
+Copy the environment file:
 ```bash
 cp packages/backend/.env.example packages/backend/.env
 ```
 
-### Step 3: Run Backend Tests & Start the API Server
-
+### 3. Run Backend Automated Tests & Start Server
 ```bash
-# Run the automated Vitest + Supertest validation & API suite
+# Run unit & API integration tests (14 passed)
 npm run test:backend
 
-# Start the backend server (automatically runs schema.sql migrations on boot)
+# Start backend server with live reload & DB schema migration
 npm run dev:backend
 ```
 
-When the backend starts, it prints both your `localhost` URL and your **Expo Go LAN URL** (e.g., `http://192.168.1.5:4000/api/v1`).
+The server will log your ready endpoints:
+```text
+╔══════════════════════════════════════════════════════════════════╗
+║        🇮🇳 MINILEDGER (BHARAT EDITION) BACKEND SERVER READY       ║
+╠══════════════════════════════════════════════════════════════════╣
+║  🌐 Local URL       : http://localhost:4000/api/v1               ║
+║  📱 Expo Go LAN URL : http://192.168.1.10:4000/api/v1            ║
+║  🖼️  Receipts Dir    : packages/backend/uploads/                   ║
+╚══════════════════════════════════════════════════════════════════╝
+```
 
-### Step 4: Start the Expo Go Mobile App
-Open a second terminal at the repository root:
-
+### 4. Start the Expo Mobile App
+In a separate terminal:
 ```bash
 npm run dev:mobile
 ```
 
-* **Android Emulator**: Automatically connects to `http://10.0.2.2:4000/api/v1`.
-* **iOS Simulator**: Automatically connects to `http://localhost:4000/api/v1`.
-* **Physical Phone via Expo Go**: Scan the QR code. On the MiniLedger Login screen, tap **`⚙️ API`** in the top-left corner and enter the **Expo Go LAN URL** printed in your backend terminal.
+* **iOS Simulator**: Press `i` to launch directly in iOS Simulator.
+* **Android Emulator**: Press `a` to launch in Android Emulator.
+* **Physical Device (Expo Go)**: Scan the QR code. If connecting to a physical phone, tap **`⚙️ API`** on the Login screen and set the **Expo Go LAN URL** printed in your backend terminal.
 
 ---
 
 ## 🔌 REST API Reference & cURL Playbook
 
-Base URL: `http://localhost:4000/api/v1` (also aliased at `http://localhost:4000/api`)
+Base URL: `http://localhost:4000/api/v1`
 
-### 1. Request Mock OTP
+### 1. Request OTP
 ```bash
 curl -X POST http://localhost:4000/api/v1/auth/request-otp \
   -H "Content-Type: application/json" \
   -d '{"phone": "9876543210"}'
 ```
-*Check your backend terminal for the ASCII OTP box (or read `debugOtp` in the JSON response).*
+*Response prints a formatted OTP box in the backend terminal:*
+```text
+╔══════════════════════════════════════════════════════════════╗
+║           🔐 MINILEDGER (BHARAT) - MOCK OTP DISPATCH         ║
+╠══════════════════════════════════════════════════════════════╣
+║  📱 Phone Number : +919876543210                           ║
+║  🔑 6-Digit OTP  : 123456                                  ║
+╚══════════════════════════════════════════════════════════════╝
+```
 
 ### 2. Verify OTP & Obtain JWT
 ```bash
@@ -157,54 +264,52 @@ curl -X POST http://localhost:4000/api/v1/auth/verify-otp \
   }'
 ```
 
-### 3. Add a Loan Entry (JSON or Multipart with Receipt Photo)
+### 3. Add a New Loan Entry (Multipart with Receipt Photo)
 ```bash
-# JSON Request
 curl -X POST http://localhost:4000/api/v1/loans \
-  -H "Authorization: Bearer <YOUR_JWT_TOKEN>" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -F "friendName=Vikram Patel" \
+  -F "friendPhone=9876543211" \
+  -F "amount=12000" \
+  -F "dueDate=2026-11-15" \
+  -F "category=RENT" \
+  -F "notes=Apartment maintenance advance" \
+  -F "receipt=@/path/to/bill.jpg"
+```
+
+### 4. Record a Partial Repayment
+```bash
+curl -X PATCH http://localhost:4000/api/v1/loans/<LOAN_ID>/repay \
+  -H "Authorization: Bearer <TOKEN>" \
   -H "Content-Type: application/json" \
   -d '{
-    "friendName": "Rohan Verma",
-    "friendPhone": "9811122233",
-    "amount": 2500,
-    "dueDate": "2026-10-15",
-    "category": "FOOD_SPLIT",
-    "notes": "Dinner split at Indiranagar"
+    "amount": 4000,
+    "note": "Paid via Google Pay UPI"
   }'
-
-# Multipart Request with Receipt Photo
-curl -X POST http://localhost:4000/api/v1/loans \
-  -H "Authorization: Bearer <YOUR_JWT_TOKEN>" \
-  -F "friendName=Priya Nair" \
-  -F "amount=5000" \
-  -F "dueDate=2026-11-05" \
-  -F "category=TRAVEL" \
-  -F "receipt=@/path/to/receipt.jpg"
 ```
 
-### 4. List Loan Entries (Supports Status, Category & Search Filters)
-```bash
-curl -X GET "http://localhost:4000/api/v1/loans?status=ALL" \
-  -H "Authorization: Bearer <YOUR_JWT_TOKEN>"
-```
-
-### 5. Mark Loan as Repaid (1-Tap Full Settlement or Partial Repayment)
-```bash
-# Full Settlement (omit amount)
-curl -X PATCH http://localhost:4000/api/v1/loans/<LOAN_ID>/repay \
-  -H "Authorization: Bearer <YOUR_JWT_TOKEN>" \
-  -H "Content-Type: application/json" \
-  -d '{}'
-
-# Partial Repayment
-curl -X PATCH http://localhost:4000/api/v1/loans/<LOAN_ID>/repay \
-  -H "Authorization: Bearer <YOUR_JWT_TOKEN>" \
-  -H "Content-Type: application/json" \
-  -d '{"amount": 1000, "note": "Paid via GPay UPI"}'
-```
-
-### 6. Get Ledger Summary (Total Lent, Total Repaid, Overdue Amount)
+### 5. Fetch Ledger Summary
 ```bash
 curl -X GET http://localhost:4000/api/v1/summary \
-  -H "Authorization: Bearer <YOUR_JWT_TOKEN>"
+  -H "Authorization: Bearer <TOKEN>"
 ```
+
+---
+
+## 🛠️ Tech Stack & Monorepo Packages
+
+| Area | Technologies | Details |
+| :--- | :--- | :--- |
+| **Mobile Runtime** | React Native `0.86.3`, Expo SDK `57.0.31` | Fast Refresh, Hermes Engine, iOS + Android |
+| **Animation & Touch** | React Native Reanimated `4.5.1`, Expo Haptics | Quad/Cubic timing curves, tactile feedback |
+| **State & Networking**| Zustand `5.0.1`, Native XHR Multipart | Lightweight reactive state, zero-overhead sync |
+| **Internationalization**| `i18next`, `react-i18next` | Instant runtime English ⇄ हिन्दी (Hindi) switching |
+| **Backend Framework** | Node.js `20+`, Express `4.21`, TypeScript `5.6` | Modular layered MVC architecture |
+| **Database** | PostgreSQL `16`, `pg` Pool | `NUMERIC(12,2)` precision, ACID transactions |
+| **File Storage** | Multer Disk Storage | Auto-sanitization, MIME-type verification, up to 5MB |
+| **Testing** | Vitest `2.1.9`, Supertest `7.0` | 14 automated unit, validation, and integration tests |
+
+---
+
+## 📄 License
+This project is open-source and licensed under the **MIT License**.

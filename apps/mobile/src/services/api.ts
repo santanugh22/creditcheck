@@ -127,26 +127,82 @@ function isFormData(body: unknown): boolean {
   return false;
 }
 
+function uploadFormDataViaXhr<T>(
+  url: string,
+  formData: FormData,
+  token?: string | null,
+): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", url);
+    xhr.setRequestHeader("Accept", "application/json");
+    if (token) {
+      xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+    }
+    // CRITICAL: Do NOT manually set Content-Type for FormData in XMLHttpRequest.
+    // The native networking engine must automatically append the multipart boundary delimiter.
+
+    xhr.onload = () => {
+      try {
+        const json = JSON.parse(xhr.responseText) as ApiEnvelope<T>;
+        if (xhr.status >= 200 && xhr.status < 300 && json && json.success) {
+          resolve(json.data);
+        } else {
+          const msg =
+            json?.error?.message ||
+            `Upload request failed with status ${xhr.status}.`;
+          reject(new Error(msg));
+        }
+      } catch (_parseErr) {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          reject(new Error("Invalid server response format."));
+        } else {
+          reject(
+            new Error(
+              `Server error (${xhr.status}): ${xhr.statusText || "Request failed"}`,
+            ),
+          );
+        }
+      }
+    };
+
+    xhr.onerror = () => {
+      reject(
+        new Error(
+          `Cannot connect to backend server at ${activeBaseUrl}. (Network request failed)`,
+        ),
+      );
+    };
+
+    xhr.ontimeout = () => {
+      reject(new Error("Image upload request timed out. Please try again."));
+    };
+
+    xhr.send(formData);
+  });
+}
+
 async function request<T>(
   endpoint: string,
   options: RequestInit = {},
 ): Promise<T> {
   const url = `${activeBaseUrl}${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
 
+  const hasFormData = isFormData(options.body);
+
+  // In React Native 0.74+, fetch() adheres strictly to WHATWG standards and fails on
+  // React Native's proprietary { uri, name, type } FormData object on iOS/Android.
+  // Using native XMLHttpRequest completely bypasses this limitation with 100% reliability.
+  if (hasFormData && typeof XMLHttpRequest !== "undefined") {
+    return uploadFormDataViaXhr<T>(url, options.body as FormData, authToken);
+  }
+
   const headers: Record<string, string> = {
     Accept: "application/json",
     ...(options.headers as Record<string, string>),
   };
 
-  const hasFormData = isFormData(options.body);
-
-  if (hasFormData) {
-    // CRITICAL: For multipart/form-data requests in React Native and browsers,
-    // NEVER supply a manual Content-Type header. The networking stack must
-    // automatically generate the Content-Type header with the multipart boundary delimiter.
-    delete headers["Content-Type"];
-    delete headers["content-type"];
-  } else if (!headers["Content-Type"]) {
+  if (!headers["Content-Type"]) {
     headers["Content-Type"] = "application/json";
   }
 
@@ -190,8 +246,12 @@ function appendReceiptToFormData(formData: FormData, receiptUri: string): void {
   let ext = extMatch ? extMatch[1].toLowerCase() : "jpg";
   if (ext === "jpeg") ext = "jpg";
 
-  // Sanitize filename to strict ASCII alphanumeric characters to avoid header parsing issues
-  const safeFilename = baseName.replace(/[^a-zA-Z0-9.-]/g, "_");
+  // Sanitize filename to strict ASCII alphanumeric characters and ensure valid image extension
+  let safeFilename = baseName.replace(/[^a-zA-Z0-9.-]/g, "_");
+  if (!safeFilename.includes(".") || safeFilename.endsWith(".")) {
+    safeFilename = `${safeFilename.replace(/\.+$/, "")}.${ext}`;
+  }
+
   const mimeType =
     ext === "png"
       ? "image/png"
@@ -201,7 +261,7 @@ function appendReceiptToFormData(formData: FormData, receiptUri: string): void {
           ? "image/heic"
           : "image/jpeg";
 
-  // Format URI correctly for Android
+  // Format URI correctly for Android & iOS
   const formattedUri =
     Platform.OS === "android" &&
     !cleanUri.startsWith("content://") &&
@@ -287,12 +347,19 @@ export const apiClient = {
       if (Platform.OS !== "web") {
         try {
           const url = `${activeBaseUrl}/loans`;
+          const rawUri = payload.receiptUri.trim();
+          const nativeFileUri =
+            !rawUri.startsWith("file://") && !rawUri.startsWith("content://")
+              ? `file://${rawUri}`
+              : rawUri;
+
           const uploadResult = await FileSystem.uploadAsync(
             url,
-            payload.receiptUri.trim(),
+            nativeFileUri,
             {
               httpMethod: "POST",
               uploadType: FileSystem.FileSystemUploadType.MULTIPART,
+              sessionType: FileSystem.FileSystemSessionType.FOREGROUND,
               fieldName: "receipt",
               parameters: {
                 friendName: payload.friendName.trim(),
@@ -328,7 +395,7 @@ export const apiClient = {
             !uploadErr.message.includes("Cannot connect")
           ) {
             console.warn(
-              "Native uploadAsync failed, trying fallback FormData:",
+              "Native uploadAsync failed, falling back to FormData via XHR:",
               uploadErr,
             );
           } else {
@@ -379,12 +446,19 @@ export const apiClient = {
     if (Platform.OS !== "web") {
       try {
         const url = `${activeBaseUrl}/loans/${id}/receipt`;
+        const rawUri = receiptUri.trim();
+        const nativeFileUri =
+          !rawUri.startsWith("file://") && !rawUri.startsWith("content://")
+            ? `file://${rawUri}`
+            : rawUri;
+
         const uploadResult = await FileSystem.uploadAsync(
           url,
-          receiptUri.trim(),
+          nativeFileUri,
           {
             httpMethod: "POST",
             uploadType: FileSystem.FileSystemUploadType.MULTIPART,
+            sessionType: FileSystem.FileSystemSessionType.FOREGROUND,
             fieldName: "receipt",
             headers: {
               Accept: "application/json",
@@ -408,7 +482,7 @@ export const apiClient = {
           !uploadErr.message.includes("Cannot connect")
         ) {
           console.warn(
-            "Native uploadAsync failed, trying fallback FormData:",
+            "Native uploadAsync failed, falling back to FormData via XHR:",
             uploadErr,
           );
         } else {
