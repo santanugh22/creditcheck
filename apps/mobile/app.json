@@ -23,6 +23,7 @@
     },
     "android": {
       "package": "com.miniledger.bharat",
+      "usesCleartextTraffic": true,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#090D16"

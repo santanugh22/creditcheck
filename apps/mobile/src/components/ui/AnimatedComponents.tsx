@@ -10,11 +10,11 @@ import {
   ViewStyle,
 } from "react-native";
 import Animated, {
+  Easing,
   useAnimatedStyle,
   useSharedValue,
   withRepeat,
   withSequence,
-  withSpring,
   withTiming,
 } from "react-native-reanimated";
 import { useTheme } from "../../theme/ThemeContext";
@@ -24,7 +24,7 @@ import { AlertCircleIcon, CheckCircleIcon } from "../icons/LedgerIcons";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
-interface SpringPressableProps extends PressableProps {
+export interface TactilePressableProps extends PressableProps {
   children: React.ReactNode;
   style?: StyleProp<ViewStyle>;
   scaleTo?: number;
@@ -32,32 +32,49 @@ interface SpringPressableProps extends PressableProps {
 }
 
 /**
- * Tactile 60fps Reanimated button wrapper with spring physics and Haptic feedback.
+ * Premium tactile touch micro-interaction adhering to Apple HIG & Material 3 guidelines.
+ * Uses high-precision quad/cubic timing curves without bouncy or wobbly spring oscillations.
  */
-export function SpringPressable({
+export function TactilePressable({
   children,
   style,
-  scaleTo = 0.96,
+  scaleTo = 0.975,
   hapticStyle = "light",
   onPressIn,
   onPressOut,
   onPress,
   disabled,
   ...rest
-}: SpringPressableProps) {
+}: TactilePressableProps) {
   const scale = useSharedValue(1);
+  const opacity = useSharedValue(1);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
+    opacity: opacity.value,
   }));
 
   const handlePressIn: PressableProps["onPressIn"] = (e) => {
-    scale.value = withSpring(scaleTo, { damping: 15, stiffness: 320 });
+    scale.value = withTiming(scaleTo, {
+      duration: 75,
+      easing: Easing.out(Easing.quad),
+    });
+    opacity.value = withTiming(0.85, {
+      duration: 75,
+      easing: Easing.out(Easing.quad),
+    });
     onPressIn?.(e);
   };
 
   const handlePressOut: PressableProps["onPressOut"] = (e) => {
-    scale.value = withSpring(1, { damping: 14, stiffness: 280 });
+    scale.value = withTiming(1, {
+      duration: 130,
+      easing: Easing.out(Easing.quad),
+    });
+    opacity.value = withTiming(1, {
+      duration: 130,
+      easing: Easing.out(Easing.quad),
+    });
     onPressOut?.(e);
   };
 
@@ -84,8 +101,11 @@ export function SpringPressable({
   );
 }
 
+// Backward-compatible alias for existing imports
+export const SpringPressable = TactilePressable;
+
 /**
- * Pulsing Overdue / Status Badge for Loan Entries
+ * Breathing Overdue / Status Badge for Loan Entries with gentle opacity glow
  */
 export function StatusBadge({
   status,
@@ -95,25 +115,25 @@ export function StatusBadge({
   label: string;
 }) {
   const { colors } = useTheme();
-  const pulse = useSharedValue(1);
+  const breathe = useSharedValue(1);
 
   useEffect(() => {
     if (status === "OVERDUE") {
-      pulse.value = withRepeat(
+      breathe.value = withRepeat(
         withSequence(
-          withTiming(1.06, { duration: 750 }),
-          withTiming(1, { duration: 750 }),
+          withTiming(0.72, { duration: 900, easing: Easing.inOut(Easing.quad) }),
+          withTiming(1, { duration: 900, easing: Easing.inOut(Easing.quad) }),
         ),
         -1,
         true,
       );
     } else {
-      pulse.value = 1;
+      breathe.value = 1;
     }
-  }, [status, pulse]);
+  }, [status, breathe]);
 
   const animatedBadgeStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: pulse.value }],
+    opacity: breathe.value,
   }));
 
   let bgColor = colors.primaryLight;

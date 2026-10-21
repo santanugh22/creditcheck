@@ -26,7 +26,7 @@ import {
   RupeeIcon,
   TrashIcon,
 } from "../components/icons/LedgerIcons";
-import { SpringPressable } from "../components/ui/AnimatedComponents";
+import { TactilePressable } from "../components/ui/AnimatedComponents";
 import { useLedgerStore } from "../store/useLedgerStore";
 import { useTheme } from "../theme/ThemeContext";
 import { formatIndianNumber, Radius, Spacing, Typography } from "../theme/tokens";
@@ -337,13 +337,13 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                 </Text>
               </View>
             </View>
-            <SpringPressable
+            <TactilePressable
               onPress={handleClose}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               style={[styles.closeBtn, { backgroundColor: colors.background }]}
             >
               <CloseIcon size={14} color={colors.textSecondary} />
-            </SpringPressable>
+            </TactilePressable>
           </View>
 
           <ScrollView
@@ -446,7 +446,7 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                     { opacity: amount.length > 0 ? 1 : 0 },
                   ]}
                 >
-                  <SpringPressable
+                  <TactilePressable
                     onPress={() => {
                       setAmount("");
                       amountInputRef.current?.focus();
@@ -458,14 +458,14 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                     ]}
                   >
                     <CloseIcon size={12} color={colors.textSecondary} />
-                  </SpringPressable>
+                  </TactilePressable>
                 </View>
               </Pressable>
 
               {/* Quick Preset Amount Chips */}
               <View style={styles.quickAmountRow}>
                 {QUICK_AMOUNTS.map((val) => (
-                  <SpringPressable
+                  <TactilePressable
                     key={val}
                     onPress={() => handleAddQuickAmount(val)}
                     style={[
@@ -484,16 +484,18 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                     >
                       +₹{val >= 1000 ? `${val / 1000}k` : val}
                     </Text>
-                  </SpringPressable>
+                  </TactilePressable>
                 ))}
               </View>
             </View>
 
             {/* 2. Friend Name */}
             <View style={styles.sectionBlock}>
-              <Text style={[styles.label, { color: colors.textPrimary }]}>
-                {t("addLoan.friendNameLabel")}
-              </Text>
+              <View style={styles.labelRow}>
+                <Text style={[styles.label, { color: colors.textPrimary }]}>
+                  {t("addLoan.friendNameLabel")}
+                </Text>
+              </View>
               <Pressable
                 onPress={() => nameInputRef.current?.focus()}
                 style={[
@@ -534,7 +536,7 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                     { opacity: friendName.length > 0 ? 1 : 0 },
                   ]}
                 >
-                  <SpringPressable
+                  <TactilePressable
                     onPress={() => {
                       setFriendName("");
                       nameInputRef.current?.focus();
@@ -546,7 +548,7 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                     ]}
                   >
                     <CloseIcon size={12} color={colors.textSecondary} />
-                  </SpringPressable>
+                  </TactilePressable>
                 </View>
               </Pressable>
             </View>
@@ -616,7 +618,7 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                     { opacity: friendPhone.length > 0 ? 1 : 0 },
                   ]}
                 >
-                  <SpringPressable
+                  <TactilePressable
                     onPress={() => {
                       setFriendPhone("");
                       phoneInputRef.current?.focus();
@@ -628,20 +630,26 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                     ]}
                   >
                     <CloseIcon size={12} color={colors.textSecondary} />
-                  </SpringPressable>
+                  </TactilePressable>
                 </View>
               </Pressable>
             </View>
 
             {/* 4. Due Date Card + Presets */}
             <View style={styles.sectionBlock}>
-              <Text style={[styles.label, { color: colors.textPrimary }]}>
-                {t("addLoan.dueDateLabel")}
-              </Text>
+              <View style={styles.labelRow}>
+                <Text style={[styles.label, { color: colors.textPrimary }]}>
+                  {t("addLoan.dueDateLabel")}
+                </Text>
+                <Text
+                  style={[styles.labelOptionalHint, { color: colors.textMuted }]}
+                >
+                  Repayment Target
+                </Text>
+              </View>
 
               {/* Tappable Date Card */}
-              {/* Tappable Date Card */}
-              <SpringPressable
+              <TactilePressable
                 onPress={() => setShowDatePicker((prev) => !prev)}
                 style={[
                   styles.dateCard,
@@ -696,7 +704,7 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                     📅 Change
                   </Text>
                 </View>
-              </SpringPressable>
+              </TactilePressable>
 
               {/* Quick Due Date Presets */}
               <View style={styles.presetChipRow}>
@@ -704,7 +712,7 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                   const targetDate = addDaysToToday(preset.days);
                   const isSelected = dueDate === targetDate;
                   return (
-                    <SpringPressable
+                    <TactilePressable
                       key={preset.label}
                       onPress={() => {
                         setDueDate(targetDate);
@@ -742,7 +750,7 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                       >
                         {preset.label}
                       </Text>
-                    </SpringPressable>
+                    </TactilePressable>
                   );
                 })}
               </View>
@@ -776,7 +784,7 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                     >
                       Select Repayment Due Date
                     </Text>
-                    <SpringPressable
+                    <TactilePressable
                       onPress={() => setShowDatePicker(false)}
                       style={[
                         styles.iosDoneBtn,
@@ -791,7 +799,7 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                       >
                         Done
                       </Text>
-                    </SpringPressable>
+                    </TactilePressable>
                   </View>
                   <DateTimePicker
                     value={parseSafeDate(dueDate)}
@@ -823,14 +831,21 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
 
             {/* 5. Category Selection Grid */}
             <View style={styles.sectionBlock}>
-              <Text style={[styles.label, { color: colors.textPrimary }]}>
-                {t("addLoan.categoryLabel")}
-              </Text>
+              <View style={styles.labelRow}>
+                <Text style={[styles.label, { color: colors.textPrimary }]}>
+                  {t("addLoan.categoryLabel")}
+                </Text>
+                <Text
+                  style={[styles.labelOptionalHint, { color: colors.textMuted }]}
+                >
+                  Purpose
+                </Text>
+              </View>
               <View style={styles.categoryGrid}>
                 {CATEGORY_OPTIONS.map((cat) => {
                   const isSelected = category === cat.key;
                   return (
-                    <SpringPressable
+                    <TactilePressable
                       key={cat.key}
                       onPress={() => setCategory(cat.key)}
                       style={[
@@ -860,7 +875,7 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                       >
                         {t(cat.labelKey)}
                       </Text>
-                    </SpringPressable>
+                    </TactilePressable>
                   );
                 })}
               </View>
@@ -904,9 +919,16 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
 
             {/* 7. Receipt Photo Attachment */}
             <View style={styles.sectionBlock}>
-              <Text style={[styles.label, { color: colors.textPrimary }]}>
-                {t("addLoan.receiptLabel")}
-              </Text>
+              <View style={styles.labelRow}>
+                <Text style={[styles.label, { color: colors.textPrimary }]}>
+                  {t("addLoan.receiptLabel")}
+                </Text>
+                <Text
+                  style={[styles.labelOptionalHint, { color: colors.textMuted }]}
+                >
+                  Optional Proof
+                </Text>
+              </View>
 
               {receiptUri ? (
                 <View
@@ -945,7 +967,7 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                       Ready to upload with entry
                     </Text>
                     <View style={styles.receiptActionRow}>
-                      <SpringPressable
+                      <TactilePressable
                         onPress={handlePickFromGallery}
                         style={[
                           styles.receiptSmallBtn,
@@ -964,8 +986,8 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                         >
                           Change
                         </Text>
-                      </SpringPressable>
-                      <SpringPressable
+                      </TactilePressable>
+                      <TactilePressable
                         onPress={() => setReceiptUri(null)}
                         style={[
                           styles.receiptSmallBtn,
@@ -984,7 +1006,7 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                         >
                           Remove
                         </Text>
-                      </SpringPressable>
+                      </TactilePressable>
                     </View>
                   </View>
                 </View>
@@ -1028,7 +1050,7 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                   </View>
 
                   <View style={styles.dropzoneBtnRow}>
-                    <SpringPressable
+                    <TactilePressable
                       onPress={handlePickFromGallery}
                       style={[
                         styles.dropzoneBtn,
@@ -1047,8 +1069,8 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                       >
                         {t("addLoan.selectFromGallery")}
                       </Text>
-                    </SpringPressable>
-                    <SpringPressable
+                    </TactilePressable>
+                    <TactilePressable
                       onPress={handleTakePhoto}
                       style={[
                         styles.dropzoneBtn,
@@ -1067,14 +1089,14 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                       >
                         {t("addLoan.takePhoto")}
                       </Text>
-                    </SpringPressable>
+                    </TactilePressable>
                   </View>
                 </View>
               )}
             </View>
 
             {/* Submit Button */}
-            <SpringPressable
+            <TactilePressable
               hapticStyle="medium"
               disabled={isSubmitting}
               onPress={handleSubmit}
@@ -1098,7 +1120,7 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                   {t("addLoan.submitButton")}
                 </Text>
               )}
-            </SpringPressable>
+            </TactilePressable>
 
             <View style={styles.footerNoteRow}>
               <Text style={[styles.footerNoteText, { color: colors.textMuted }]}>
@@ -1193,17 +1215,18 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   sectionBlock: {
-    marginBottom: Spacing.lg,
+    marginBottom: 20,
   },
   labelRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 6,
+    marginBottom: Spacing.sm,
   },
   label: {
     fontSize: Typography.fontSizes.xs,
     fontWeight: Typography.fontWeights.bold,
+    letterSpacing: 0.3,
   },
   labelOptionalHint: {
     fontSize: 11,
@@ -1219,7 +1242,7 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderRadius: Radius.lg,
     paddingHorizontal: Spacing.md,
-    height: 60,
+    height: 62,
   },
   amountCurrencyPrefix: {
     fontSize: Typography.fontSizes.xxl,
@@ -1252,12 +1275,12 @@ const styles = StyleSheet.create({
   quickAmountRow: {
     flexDirection: "row",
     gap: Spacing.sm,
-    marginTop: Spacing.sm,
+    marginTop: Spacing.sm + 2,
   },
   quickAmountChip: {
     flex: 1,
-    paddingVertical: 7,
-    borderRadius: Radius.md,
+    paddingVertical: 8,
+    borderRadius: Radius.full,
     borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
@@ -1272,7 +1295,7 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderRadius: Radius.md,
     paddingHorizontal: Spacing.md,
-    height: 48,
+    height: 52,
   },
   inputLeadingIcon: {
     fontSize: 15,
@@ -1292,7 +1315,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderWidth: 1.5,
     borderRadius: Radius.md,
-    height: 48,
+    height: 52,
     overflow: "hidden",
     paddingRight: Spacing.md,
   },
@@ -1322,7 +1345,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderWidth: 1.5,
     borderRadius: Radius.lg,
-    padding: Spacing.md,
+    padding: Spacing.md + 2,
     gap: Spacing.md,
   },
   dateIconCircle: {
@@ -1356,11 +1379,11 @@ const styles = StyleSheet.create({
   presetChipRow: {
     flexDirection: "row",
     gap: Spacing.xs + 2,
-    marginTop: Spacing.sm,
+    marginTop: Spacing.sm + 2,
   },
   presetChip: {
     flex: 1,
-    paddingVertical: 6,
+    paddingVertical: 7,
     borderRadius: Radius.full,
     borderWidth: 1,
     alignItems: "center",
@@ -1400,8 +1423,8 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
   },
   categoryCard: {
-    width: "31%",
-    paddingVertical: 10,
+    width: "31.5%",
+    paddingVertical: 12,
     paddingHorizontal: Spacing.xs,
     borderRadius: Radius.md,
     borderWidth: 1.5,
@@ -1420,9 +1443,9 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderRadius: Radius.md,
     paddingHorizontal: Spacing.md,
-    paddingVertical: 10,
+    paddingVertical: Spacing.md,
     fontSize: Typography.fontSizes.sm,
-    minHeight: 72,
+    minHeight: 84,
     textAlignVertical: "top",
   },
   receiptAttachedCard: {

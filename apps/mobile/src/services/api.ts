@@ -1,5 +1,6 @@
-import Constants from "expo-constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Constants from "expo-constants";
+import * as FileSystem from "expo-file-system/legacy";
 import { Platform } from "react-native";
 import {
   CreateLoanPayload,
@@ -189,7 +190,8 @@ function appendReceiptToFormData(formData: FormData, receiptUri: string): void {
   let ext = extMatch ? extMatch[1].toLowerCase() : "jpg";
   if (ext === "jpeg") ext = "jpg";
 
-  const safeFilename = extMatch ? baseName : `${baseName || `receipt-${Date.now()}`}.${ext}`;
+  // Sanitize filename to strict ASCII alphanumeric characters to avoid header parsing issues
+  const safeFilename = baseName.replace(/[^a-zA-Z0-9.-]/g, "_");
   const mimeType =
     ext === "png"
       ? "image/png"
@@ -199,8 +201,16 @@ function appendReceiptToFormData(formData: FormData, receiptUri: string): void {
           ? "image/heic"
           : "image/jpeg";
 
+  // Format URI correctly for Android
+  const formattedUri =
+    Platform.OS === "android" &&
+    !cleanUri.startsWith("content://") &&
+    !cleanUri.startsWith("file://")
+      ? `file://${cleanUri}`
+      : cleanUri;
+
   formData.append("receipt", {
-    uri: cleanUri,
+    uri: formattedUri,
     name: safeFilename,
     type: mimeType,
   } as unknown as Blob);
@@ -272,8 +282,61 @@ export const apiClient = {
   getLoanById: (id: string) =>
     request<LoanEntry>(`/loans/${id}`, { method: "GET" }),
 
-  createLoan: (payload: CreateLoanPayload) => {
+  createLoan: async (payload: CreateLoanPayload) => {
     if (payload.receiptUri && payload.receiptUri.trim().length > 0) {
+      if (Platform.OS !== "web") {
+        try {
+          const url = `${activeBaseUrl}/loans`;
+          const uploadResult = await FileSystem.uploadAsync(
+            url,
+            payload.receiptUri.trim(),
+            {
+              httpMethod: "POST",
+              uploadType: FileSystem.FileSystemUploadType.MULTIPART,
+              fieldName: "receipt",
+              parameters: {
+                friendName: payload.friendName.trim(),
+                amount: String(payload.amount),
+                dueDate: payload.dueDate.trim(),
+                category: payload.category,
+                ...(payload.friendPhone && payload.friendPhone.trim().length > 0
+                  ? { friendPhone: payload.friendPhone.trim() }
+                  : {}),
+                ...(payload.notes && payload.notes.trim().length > 0
+                  ? { notes: payload.notes.trim() }
+                  : {}),
+              },
+              headers: {
+                Accept: "application/json",
+                ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+              },
+            },
+          );
+
+          const json = JSON.parse(uploadResult.body) as ApiEnvelope<LoanEntry>;
+          if (uploadResult.status >= 400 || !json.success) {
+            throw new Error(
+              json?.error?.message ||
+                `Loan creation failed with status ${uploadResult.status}.`,
+            );
+          }
+          return json.data;
+        } catch (uploadErr) {
+          if (
+            uploadErr instanceof Error &&
+            !uploadErr.message.includes("status") &&
+            !uploadErr.message.includes("Cannot connect")
+          ) {
+            console.warn(
+              "Native uploadAsync failed, trying fallback FormData:",
+              uploadErr,
+            );
+          } else {
+            throw uploadErr;
+          }
+        }
+      }
+
       const formData = new FormData();
       formData.append("friendName", payload.friendName.trim());
       if (payload.friendPhone && payload.friendPhone.trim().length > 0) {
@@ -312,7 +375,48 @@ export const apiClient = {
       body: JSON.stringify(payload || {}),
     }),
 
-  attachReceipt: (id: string, receiptUri: string) => {
+  attachReceipt: async (id: string, receiptUri: string) => {
+    if (Platform.OS !== "web") {
+      try {
+        const url = `${activeBaseUrl}/loans/${id}/receipt`;
+        const uploadResult = await FileSystem.uploadAsync(
+          url,
+          receiptUri.trim(),
+          {
+            httpMethod: "POST",
+            uploadType: FileSystem.FileSystemUploadType.MULTIPART,
+            fieldName: "receipt",
+            headers: {
+              Accept: "application/json",
+              ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+            },
+          },
+        );
+
+        const json = JSON.parse(uploadResult.body) as ApiEnvelope<LoanEntry>;
+        if (uploadResult.status >= 400 || !json.success) {
+          throw new Error(
+            json?.error?.message ||
+              `Receipt upload failed with status ${uploadResult.status}.`,
+          );
+        }
+        return json.data;
+      } catch (uploadErr) {
+        if (
+          uploadErr instanceof Error &&
+          !uploadErr.message.includes("status") &&
+          !uploadErr.message.includes("Cannot connect")
+        ) {
+          console.warn(
+            "Native uploadAsync failed, trying fallback FormData:",
+            uploadErr,
+          );
+        } else {
+          throw uploadErr;
+        }
+      }
+    }
+
     const formData = new FormData();
     appendReceiptToFormData(formData, receiptUri);
     return request<LoanEntry>(`/loans/${id}/receipt`, {

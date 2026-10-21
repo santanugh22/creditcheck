@@ -3,9 +3,10 @@ import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, View } from "react-native";
 import Animated, {
+  Easing,
   useAnimatedStyle,
   useSharedValue,
-  withSpring,
+  withTiming,
 } from "react-native-reanimated";
 import { formatINR, Radius, Spacing, Typography } from "../../theme/tokens";
 import { LedgerSummary } from "../../types/ledger";
@@ -14,7 +15,7 @@ import {
   CheckCircleIcon,
   WalletIcon,
 } from "../icons/LedgerIcons";
-import { SpringPressable } from "./AnimatedComponents";
+import { TactilePressable } from "./AnimatedComponents";
 
 interface SummaryHeroCardProps {
   summary: LedgerSummary;
@@ -30,9 +31,9 @@ export function SummaryHeroCard({
 
   useEffect(() => {
     const clampedRate = Math.min(100, Math.max(0, summary.repaymentRate || 0));
-    progressWidth.value = withSpring(clampedRate, {
-      damping: 18,
-      stiffness: 140,
+    progressWidth.value = withTiming(clampedRate, {
+      duration: 650,
+      easing: Easing.bezier(0.16, 1, 0.3, 1),
     });
   }, [summary.repaymentRate, progressWidth]);
 
@@ -90,7 +91,7 @@ export function SummaryHeroCard({
 
         <View style={styles.divider} />
 
-        <SpringPressable
+        <TactilePressable
           onPress={onPressOverdueFilter}
           style={[
             styles.metricBox,
@@ -122,7 +123,7 @@ export function SummaryHeroCard({
           >
             {formatINR(summary.overdueAmount)}
           </Text>
-        </SpringPressable>
+        </TactilePressable>
       </View>
 
       {/* Due Soon Alert Strip (if loans are due within next 3 days) */}
