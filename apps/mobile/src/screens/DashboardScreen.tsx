@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   FlatList,
-  Pressable,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -22,6 +21,7 @@ import { LoanEntryCard } from "../components/ledger/LoanEntryCard";
 import {
   SkeletonLoaderCard,
   SpringPressable,
+  TactilePressable,
 } from "../components/ui/AnimatedComponents";
 import { SummaryHeroCard } from "../components/ui/SummaryHeroCard";
 import { useAuthStore } from "../store/useAuthStore";
@@ -281,8 +281,7 @@ export function DashboardScreen() {
             )}
 
             {/* Search Input Bar */}
-            <Pressable
-              onPress={() => searchInputRef.current?.focus()}
+            <View
               style={[
                 styles.searchBar,
                 {
@@ -291,15 +290,12 @@ export function DashboardScreen() {
                 },
               ]}
             >
-              <Pressable
-                onPress={() => searchInputRef.current?.focus()}
-                style={styles.searchIconBox}
-              >
+              <View style={styles.searchIconBox}>
                 <SearchIcon
                   size={19}
                   color={isSearchFocused ? colors.primary : colors.textMuted}
                 />
-              </Pressable>
+              </View>
               <TextInput
                 ref={searchInputRef}
                 value={searchQuery}
@@ -311,6 +307,8 @@ export function DashboardScreen() {
                 returnKeyType="search"
                 autoCorrect={false}
                 autoCapitalize="none"
+                selectionColor={colors.primary}
+                cursorColor={colors.primary}
                 style={[styles.searchInput, { color: colors.textPrimary }]}
               />
               <View
@@ -320,7 +318,7 @@ export function DashboardScreen() {
                   { opacity: searchQuery.length > 0 ? 1 : 0 },
                 ]}
               >
-                <SpringPressable
+                <TactilePressable
                   onPress={() => {
                     setSearchQuery("");
                     searchInputRef.current?.focus();
@@ -332,9 +330,9 @@ export function DashboardScreen() {
                   ]}
                 >
                   <CloseIcon size={12} color={colors.textSecondary} />
-                </SpringPressable>
+                </TactilePressable>
               </View>
-            </Pressable>
+            </View>
 
             {/* Active Search Result Pill */}
             {searchQuery.trim().length > 0 && (

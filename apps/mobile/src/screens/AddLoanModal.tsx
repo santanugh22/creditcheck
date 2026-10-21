@@ -347,6 +347,7 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
           </View>
 
           <ScrollView
+            style={styles.sheetScroll}
             contentContainerStyle={styles.formScroll}
             keyboardShouldPersistTaps="handled"
             keyboardDismissMode="none"
@@ -391,8 +392,7 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                 </Text>
               </View>
 
-              <Pressable
-                onPress={() => amountInputRef.current?.focus()}
+              <View
                 style={[
                   styles.amountInputContainer,
                   {
@@ -406,7 +406,6 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                 ]}
               >
                 <Text
-                  onPress={() => amountInputRef.current?.focus()}
                   style={[
                     styles.amountCurrencyPrefix,
                     {
@@ -434,6 +433,8 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                   placeholder="0"
                   placeholderTextColor={colors.textMuted}
                   keyboardType="decimal-pad"
+                  selectionColor={colors.primary}
+                  cursorColor={colors.primary}
                   style={[
                     styles.heroAmountTextInput,
                     { color: colors.textPrimary },
@@ -460,7 +461,7 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                     <CloseIcon size={12} color={colors.textSecondary} />
                   </TactilePressable>
                 </View>
-              </Pressable>
+              </View>
 
               {/* Quick Preset Amount Chips */}
               <View style={styles.quickAmountRow}>
@@ -496,8 +497,7 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                   {t("addLoan.friendNameLabel")}
                 </Text>
               </View>
-              <Pressable
-                onPress={() => nameInputRef.current?.focus()}
+              <View
                 style={[
                   styles.textInputBox,
                   {
@@ -508,12 +508,7 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                   },
                 ]}
               >
-                <Text
-                  onPress={() => nameInputRef.current?.focus()}
-                  style={styles.inputLeadingIcon}
-                >
-                  👤
-                </Text>
+                <Text style={styles.inputLeadingIcon}>👤</Text>
                 <TextInput
                   ref={nameInputRef}
                   value={friendName}
@@ -524,6 +519,8 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                   placeholderTextColor={colors.textMuted}
                   autoCapitalize="words"
                   autoCorrect={false}
+                  selectionColor={colors.primary}
+                  cursorColor={colors.primary}
                   style={[
                     styles.innerTextInput,
                     { color: colors.textPrimary },
@@ -550,7 +547,7 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                     <CloseIcon size={12} color={colors.textSecondary} />
                   </TactilePressable>
                 </View>
-              </Pressable>
+              </View>
             </View>
 
             {/* 3. Friend Phone (With Indian +91 Badge) */}
@@ -565,8 +562,7 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                   WhatsApp Reminders
                 </Text>
               </View>
-              <Pressable
-                onPress={() => phoneInputRef.current?.focus()}
+              <View
                 style={[
                   styles.phoneInputRow,
                   {
@@ -577,8 +573,7 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                   },
                 ]}
               >
-                <Pressable
-                  onPress={() => phoneInputRef.current?.focus()}
+                <View
                   style={[
                     styles.phonePrefixBox,
                     { borderRightColor: colors.border },
@@ -592,7 +587,7 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                   >
                     🇮🇳 +91
                   </Text>
-                </Pressable>
+                </View>
                 <TextInput
                   ref={phoneInputRef}
                   value={friendPhone}
@@ -606,6 +601,8 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                   placeholderTextColor={colors.textMuted}
                   keyboardType="phone-pad"
                   maxLength={10}
+                  selectionColor={colors.primary}
+                  cursorColor={colors.primary}
                   style={[
                     styles.phoneTextInput,
                     { color: colors.textPrimary },
@@ -632,7 +629,7 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                     <CloseIcon size={12} color={colors.textSecondary} />
                   </TactilePressable>
                 </View>
-              </Pressable>
+              </View>
             </View>
 
             {/* 4. Due Date Card + Presets */}
@@ -1141,8 +1138,14 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   backdropDismiss: {
-    flex: 1,
-    width: "100%",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  sheetScroll: {
+    flexShrink: 1,
   },
   sheet: {
     maxHeight: "92%",
