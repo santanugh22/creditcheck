@@ -1,7 +1,8 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   FlatList,
+  Pressable,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -59,6 +60,7 @@ export function DashboardScreen() {
     resetLedger,
   } = useLedgerStore();
 
+  const searchInputRef = useRef<TextInput>(null);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
 
@@ -279,27 +281,27 @@ export function DashboardScreen() {
             )}
 
             {/* Search Input Bar */}
-            <View
+            <Pressable
+              onPress={() => searchInputRef.current?.focus()}
               style={[
                 styles.searchBar,
                 {
                   backgroundColor: colors.surface,
                   borderColor: isSearchFocused ? colors.primary : colors.border,
-                  shadowColor: isSearchFocused ? colors.primary : "transparent",
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: isSearchFocused ? 0.12 : 0,
-                  shadowRadius: 6,
-                  elevation: isSearchFocused ? 2 : 0,
                 },
               ]}
             >
-              <View style={styles.searchIconBox}>
+              <Pressable
+                onPress={() => searchInputRef.current?.focus()}
+                style={styles.searchIconBox}
+              >
                 <SearchIcon
                   size={19}
                   color={isSearchFocused ? colors.primary : colors.textMuted}
                 />
-              </View>
+              </Pressable>
               <TextInput
+                ref={searchInputRef}
                 value={searchQuery}
                 onChangeText={setSearchQuery}
                 onFocus={() => setIsSearchFocused(true)}
@@ -311,9 +313,18 @@ export function DashboardScreen() {
                 autoCapitalize="none"
                 style={[styles.searchInput, { color: colors.textPrimary }]}
               />
-              {searchQuery.length > 0 && (
+              <View
+                pointerEvents={searchQuery.length > 0 ? "auto" : "none"}
+                style={[
+                  styles.searchClearWrapper,
+                  { opacity: searchQuery.length > 0 ? 1 : 0 },
+                ]}
+              >
                 <SpringPressable
-                  onPress={() => setSearchQuery("")}
+                  onPress={() => {
+                    setSearchQuery("");
+                    searchInputRef.current?.focus();
+                  }}
                   hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                   style={[
                     styles.searchClearBtn,
@@ -322,8 +333,8 @@ export function DashboardScreen() {
                 >
                   <CloseIcon size={12} color={colors.textSecondary} />
                 </SpringPressable>
-              )}
-            </View>
+              </View>
+            </Pressable>
 
             {/* Active Search Result Pill */}
             {searchQuery.trim().length > 0 && (
@@ -620,7 +631,7 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    height: "100%",
+    alignSelf: "stretch",
     fontSize: Typography.fontSizes.sm,
     fontWeight: "500",
     includeFontPadding: false,
@@ -628,13 +639,19 @@ const styles = StyleSheet.create({
     paddingVertical: 0,
     paddingHorizontal: Spacing.xs,
   },
+  searchClearWrapper: {
+    width: 28,
+    height: 28,
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: Spacing.xs,
+  },
   searchClearBtn: {
     width: 24,
     height: 24,
     borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",
-    marginLeft: Spacing.xs,
   },
   searchActiveBar: {
     flexDirection: "row",

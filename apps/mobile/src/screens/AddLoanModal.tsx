@@ -1,6 +1,6 @@
 import DateTimePicker from "@react-native-community/datetimepicker";
 import * as ImagePicker from "expo-image-picker";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
@@ -138,6 +138,11 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
   const [notes, setNotes] = useState("");
   const [receiptUri, setReceiptUri] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
+
+  const amountInputRef = useRef<TextInput>(null);
+  const nameInputRef = useRef<TextInput>(null);
+  const phoneInputRef = useRef<TextInput>(null);
+  const notesInputRef = useRef<TextInput>(null);
 
   const [isNameFocused, setIsNameFocused] = useState(false);
   const [isPhoneFocused, setIsPhoneFocused] = useState(false);
@@ -344,6 +349,7 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
           <ScrollView
             contentContainerStyle={styles.formScroll}
             keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="none"
             showsVerticalScrollIndicator={false}
           >
             {/* Error Banner */}
@@ -370,14 +376,23 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                 <Text style={[styles.label, { color: colors.textPrimary }]}>
                   {t("addLoan.amountLabel")}
                 </Text>
-                {numericAmount > 0 && (
-                  <Text style={[styles.amountPreview, { color: colors.primary }]}>
-                    ₹{formatIndianNumber(numericAmount)}
-                  </Text>
-                )}
+                <Text
+                  style={[
+                    styles.amountPreview,
+                    {
+                      color: colors.primary,
+                      opacity: numericAmount > 0 ? 1 : 0,
+                    },
+                  ]}
+                >
+                  {numericAmount > 0
+                    ? `₹${formatIndianNumber(numericAmount)}`
+                    : " "}
+                </Text>
               </View>
 
-              <View
+              <Pressable
+                onPress={() => amountInputRef.current?.focus()}
                 style={[
                   styles.amountInputContainer,
                   {
@@ -387,16 +402,11 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                       : numericAmount > 0
                         ? colors.borderStrong
                         : colors.border,
-                    shadowColor: isAmountFocused
-                      ? colors.primary
-                      : "transparent",
-                    shadowOpacity: isAmountFocused ? 0.15 : 0,
-                    shadowRadius: 6,
-                    elevation: isAmountFocused ? 2 : 0,
                   },
                 ]}
               >
                 <Text
+                  onPress={() => amountInputRef.current?.focus()}
                   style={[
                     styles.amountCurrencyPrefix,
                     {
@@ -410,6 +420,7 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                   ₹
                 </Text>
                 <TextInput
+                  ref={amountInputRef}
                   value={amount}
                   onChangeText={(txt) => {
                     const clean = txt.replace(/[^0-9.]/g, "");
@@ -428,9 +439,18 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                     { color: colors.textPrimary },
                   ]}
                 />
-                {amount.length > 0 && (
+                <View
+                  pointerEvents={amount.length > 0 ? "auto" : "none"}
+                  style={[
+                    styles.clearWrapper,
+                    { opacity: amount.length > 0 ? 1 : 0 },
+                  ]}
+                >
                   <SpringPressable
-                    onPress={() => setAmount("")}
+                    onPress={() => {
+                      setAmount("");
+                      amountInputRef.current?.focus();
+                    }}
                     hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                     style={[
                       styles.clearInputPill,
@@ -439,8 +459,8 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                   >
                     <CloseIcon size={12} color={colors.textSecondary} />
                   </SpringPressable>
-                )}
-              </View>
+                </View>
+              </Pressable>
 
               {/* Quick Preset Amount Chips */}
               <View style={styles.quickAmountRow}>
@@ -474,7 +494,8 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
               <Text style={[styles.label, { color: colors.textPrimary }]}>
                 {t("addLoan.friendNameLabel")}
               </Text>
-              <View
+              <Pressable
+                onPress={() => nameInputRef.current?.focus()}
                 style={[
                   styles.textInputBox,
                   {
@@ -485,8 +506,14 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                   },
                 ]}
               >
-                <Text style={styles.inputLeadingIcon}>👤</Text>
+                <Text
+                  onPress={() => nameInputRef.current?.focus()}
+                  style={styles.inputLeadingIcon}
+                >
+                  👤
+                </Text>
                 <TextInput
+                  ref={nameInputRef}
                   value={friendName}
                   onChangeText={setFriendName}
                   onFocus={() => setIsNameFocused(true)}
@@ -500,9 +527,18 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                     { color: colors.textPrimary },
                   ]}
                 />
-                {friendName.length > 0 && (
+                <View
+                  pointerEvents={friendName.length > 0 ? "auto" : "none"}
+                  style={[
+                    styles.clearWrapper,
+                    { opacity: friendName.length > 0 ? 1 : 0 },
+                  ]}
+                >
                   <SpringPressable
-                    onPress={() => setFriendName("")}
+                    onPress={() => {
+                      setFriendName("");
+                      nameInputRef.current?.focus();
+                    }}
                     hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                     style={[
                       styles.clearInputPill,
@@ -511,8 +547,8 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                   >
                     <CloseIcon size={12} color={colors.textSecondary} />
                   </SpringPressable>
-                )}
-              </View>
+                </View>
+              </Pressable>
             </View>
 
             {/* 3. Friend Phone (With Indian +91 Badge) */}
@@ -527,7 +563,8 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                   WhatsApp Reminders
                 </Text>
               </View>
-              <View
+              <Pressable
+                onPress={() => phoneInputRef.current?.focus()}
                 style={[
                   styles.phoneInputRow,
                   {
@@ -538,7 +575,8 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                   },
                 ]}
               >
-                <View
+                <Pressable
+                  onPress={() => phoneInputRef.current?.focus()}
                   style={[
                     styles.phonePrefixBox,
                     { borderRightColor: colors.border },
@@ -552,8 +590,9 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                   >
                     🇮🇳 +91
                   </Text>
-                </View>
+                </Pressable>
                 <TextInput
+                  ref={phoneInputRef}
                   value={friendPhone}
                   onChangeText={(txt) => {
                     const cleaned = txt.replace(/\D/g, "");
@@ -570,9 +609,18 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                     { color: colors.textPrimary },
                   ]}
                 />
-                {friendPhone.length > 0 && (
+                <View
+                  pointerEvents={friendPhone.length > 0 ? "auto" : "none"}
+                  style={[
+                    styles.clearWrapper,
+                    { opacity: friendPhone.length > 0 ? 1 : 0 },
+                  ]}
+                >
                   <SpringPressable
-                    onPress={() => setFriendPhone("")}
+                    onPress={() => {
+                      setFriendPhone("");
+                      phoneInputRef.current?.focus();
+                    }}
                     hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                     style={[
                       styles.clearInputPill,
@@ -581,8 +629,8 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                   >
                     <CloseIcon size={12} color={colors.textSecondary} />
                   </SpringPressable>
-                )}
-              </View>
+                </View>
+              </Pressable>
             </View>
 
             {/* 4. Due Date Card + Presets */}
@@ -831,6 +879,7 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                 </Text>
               </View>
               <TextInput
+                ref={notesInputRef}
                 value={notes}
                 onChangeText={setNotes}
                 onFocus={() => setIsNotesFocused(true)}
@@ -1070,11 +1119,8 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   backdropDismiss: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+    flex: 1,
+    width: "100%",
   },
   sheet: {
     maxHeight: "92%",
@@ -1182,12 +1228,19 @@ const styles = StyleSheet.create({
   },
   heroAmountTextInput: {
     flex: 1,
-    height: "100%",
+    alignSelf: "stretch",
     fontSize: Typography.fontSizes.xxl,
     fontWeight: Typography.fontWeights.bold,
     paddingVertical: 0,
     includeFontPadding: false,
     textAlignVertical: "center",
+  },
+  clearWrapper: {
+    width: 26,
+    height: 26,
+    alignItems: "center",
+    justifyContent: "center",
+    marginLeft: Spacing.xs,
   },
   clearInputPill: {
     width: 22,
@@ -1195,7 +1248,6 @@ const styles = StyleSheet.create({
     borderRadius: 11,
     alignItems: "center",
     justifyContent: "center",
-    marginLeft: Spacing.xs,
   },
   quickAmountRow: {
     flexDirection: "row",
@@ -1228,7 +1280,7 @@ const styles = StyleSheet.create({
   },
   innerTextInput: {
     flex: 1,
-    height: "100%",
+    alignSelf: "stretch",
     fontSize: Typography.fontSizes.sm,
     fontWeight: "500",
     paddingVertical: 0,
@@ -1258,7 +1310,7 @@ const styles = StyleSheet.create({
   },
   phoneTextInput: {
     flex: 1,
-    height: "100%",
+    alignSelf: "stretch",
     fontSize: Typography.fontSizes.sm,
     fontWeight: "500",
     paddingVertical: 0,
