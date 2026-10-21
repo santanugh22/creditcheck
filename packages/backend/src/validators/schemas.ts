@@ -99,7 +99,20 @@ export const createLoanSchema = z.object({
   dueDate: z
     .string({ required_error: "Due date is required" })
     .trim()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, "Due date must be in YYYY-MM-DD format"),
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "Due date must be in YYYY-MM-DD format")
+    .refine(
+      (val) => {
+        const now = new Date();
+        const y = now.getFullYear();
+        const m = String(now.getMonth() + 1).padStart(2, "0");
+        const d = String(now.getDate()).padStart(2, "0");
+        const todayLocal = `${y}-${m}-${d}`;
+        const todayUtc = now.toISOString().slice(0, 10);
+        const earliestToday = todayLocal < todayUtc ? todayLocal : todayUtc;
+        return val >= earliestToday;
+      },
+      { message: "Due date cannot be in the past" },
+    ),
   category: loanCategorySchema.optional().default("PERSONAL"),
   notes: z
     .string()

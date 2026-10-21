@@ -1,6 +1,4 @@
-import DateTimePicker, {
-  DateTimePickerEvent,
-} from "@react-native-community/datetimepicker";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import * as ImagePicker from "expo-image-picker";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -62,6 +60,7 @@ interface DatePreset {
 }
 
 const DATE_PRESETS: DatePreset[] = [
+  { label: "Today", days: 0 },
   { label: "+3 Days", days: 3 },
   { label: "+1 Week", days: 7 },
   { label: "+15 Days", days: 15 },
@@ -112,17 +111,21 @@ function formatDisplayDate(dateStr: string): string {
 }
 
 function parseSafeDate(dateStr: string): Date {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
   try {
     if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
       const [y, m, d] = dateStr.split("-").map(Number);
-      return new Date(y, m - 1, d);
+      const parsed = new Date(y, m - 1, d);
+      parsed.setHours(0, 0, 0, 0);
+      return parsed < today ? today : parsed;
     }
   } catch (_e) {}
-  return new Date();
+  return today;
 }
 
 export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
-  const { colors } = useTheme();
+  const { colors, isDarkMode } = useTheme();
   const { t } = useTranslation();
   const { createLoanEntry, isSubmitting } = useLedgerStore();
 
@@ -209,13 +212,28 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
     }
   };
 
-  const handleDateChange = (_event: DateTimePickerEvent, selected?: Date) => {
+  const handleDateValueChange = (
+    _event: unknown,
+    selected?: Date,
+  ) => {
     if (Platform.OS === "android") {
       setShowDatePicker(false);
     }
     if (selected) {
-      setDueDate(formatLocalDate(selected));
+      const todayStr = formatLocalDate(new Date());
+      const selectedStr = formatLocalDate(selected);
+      if (selectedStr < todayStr) {
+        setFormError("Due date cannot be in the past. Selected today instead.");
+        setDueDate(todayStr);
+      } else {
+        setFormError(null);
+        setDueDate(selectedStr);
+      }
     }
+  };
+
+  const handleDatePickerDismiss = () => {
+    setShowDatePicker(false);
   };
 
   const handleSubmit = async () => {
@@ -234,6 +252,12 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
 
     if (!/^\d{4}-\d{2}-\d{2}$/.test(dueDate)) {
       setFormError("Due date must be in YYYY-MM-DD format.");
+      return;
+    }
+
+    const todayStr = formatLocalDate(new Date());
+    if (dueDate < todayStr) {
+      setFormError("Due date cannot be in the past. Please select today or a future date.");
       return;
     }
 
@@ -568,15 +592,20 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
               </Text>
 
               {/* Tappable Date Card */}
+              {/* Tappable Date Card */}
               <SpringPressable
                 onPress={() => setShowDatePicker((prev) => !prev)}
                 style={[
                   styles.dateCard,
                   {
-                    backgroundColor: colors.background,
+                    backgroundColor: isDarkMode
+                      ? colors.surfaceElevated
+                      : colors.surface,
                     borderColor: showDatePicker
                       ? colors.primary
-                      : colors.borderStrong,
+                      : isDarkMode
+                        ? colors.borderStrong
+                        : colors.border,
                   },
                 ]}
               >
@@ -604,8 +633,12 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                   style={[
                     styles.changeDatePill,
                     {
-                      backgroundColor: colors.surface,
-                      borderColor: colors.border,
+                      backgroundColor: isDarkMode
+                        ? colors.surface
+                        : colors.background,
+                      borderColor: isDarkMode
+                        ? colors.borderStrong
+                        : colors.border,
                     },
                   ]}
                 >
@@ -627,6 +660,7 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                       key={preset.label}
                       onPress={() => {
                         setDueDate(targetDate);
+                        setFormError(null);
                         setShowDatePicker(false);
                       }}
                       style={[
@@ -634,10 +668,14 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                         {
                           backgroundColor: isSelected
                             ? colors.primary
-                            : colors.background,
+                            : isDarkMode
+                              ? colors.surfaceElevated
+                              : colors.background,
                           borderColor: isSelected
                             ? colors.primary
-                            : colors.borderStrong,
+                            : isDarkMode
+                              ? colors.borderStrong
+                              : colors.border,
                         },
                       ]}
                     >
@@ -647,7 +685,9 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                           {
                             color: isSelected
                               ? "#FFFFFF"
-                              : colors.textSecondary,
+                              : isDarkMode
+                                ? colors.textPrimary
+                                : colors.textSecondary,
                             fontWeight: isSelected ? "700" : "500",
                           },
                         ]}
@@ -665,8 +705,17 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                   style={[
                     styles.iosPickerCard,
                     {
-                      backgroundColor: colors.background,
-                      borderColor: colors.border,
+                      backgroundColor: isDarkMode
+                        ? colors.surfaceElevated
+                        : colors.surface,
+                      borderColor: isDarkMode
+                        ? colors.borderStrong
+                        : colors.border,
+                      shadowColor: "#000",
+                      shadowOffset: { width: 0, height: 4 },
+                      shadowOpacity: isDarkMode ? 0.35 : 0.08,
+                      shadowRadius: 8,
+                      elevation: 4,
                     },
                   ]}
                 >
@@ -700,8 +749,12 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                     value={parseSafeDate(dueDate)}
                     mode="date"
                     display="inline"
-                    onChange={handleDateChange}
+                    minimumDate={new Date()}
+                    themeVariant={isDarkMode ? "dark" : "light"}
+                    accentColor={colors.primary}
                     textColor={colors.textPrimary}
+                    onValueChange={handleDateValueChange}
+                    onDismiss={handleDatePickerDismiss}
                   />
                 </View>
               )}
@@ -712,7 +765,10 @@ export function AddLoanModal({ visible, onClose }: AddLoanModalProps) {
                   value={parseSafeDate(dueDate)}
                   mode="date"
                   display="default"
-                  onChange={handleDateChange}
+                  minimumDate={new Date()}
+                  themeVariant={isDarkMode ? "dark" : "light"}
+                  onValueChange={handleDateValueChange}
+                  onDismiss={handleDatePickerDismiss}
                 />
               )}
             </View>

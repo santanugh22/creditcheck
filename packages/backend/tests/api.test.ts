@@ -49,6 +49,18 @@ describe("MiniLedger Backend — Unit, Validation & API Integration Suite", () =
         dueDate: "15-11-2026", // Wrong format
       });
       expect(invalid.success).toBe(false);
+
+      const pastDate = createLoanSchema.safeParse({
+        friendName: "Past Date Friend",
+        amount: 500,
+        dueDate: "2020-01-01",
+      });
+      expect(pastDate.success).toBe(false);
+      if (!pastDate.success) {
+        expect(pastDate.error.issues[0]?.message).toBe(
+          "Due date cannot be in the past",
+        );
+      }
     });
 
     it("rejects non-6-digit OTP codes", () => {
